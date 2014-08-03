@@ -3259,4 +3259,382 @@ exports.BattleAbilities = {
 		rating: 4,
 		num: -4
 	}
+	
+	
+	
+	//SAGE
+	"adrenaline": { //pulled from Defiant + Overgrow
+		desc: "At low health, the bearer's speed is raised.",
+		shortDesc: "Raises speed at critical health.",
+		id: "adrenaline",
+		isNonstandard: true,
+		onModifySpdPriority: 5,
+		onModifySpd: function (spd, attacker, defender, move) {
+			if (attacker.hp <= attacker.maxhp / 3) {
+				this.boost({spd: 2});
+				//return this.chainModify(1.5);
+				//this.add('-setboost', target, 'atk', 12, '[from] ability: Anger Point');
+				//what do these commented lines do
+			}
+		},
+		name: "Adrenaline",
+		// implemented in the corresponding move
+		rating: 4, //don't give a shit about ratings
+		num: 200
+	},
+	"allure": { //pulled from rivalry, wonder skin and sweet scent
+		desc: "The chance of encountering opposite gendered pokemon is increased, and their evasion is lowered.",
+		shortDesc: "Lowers evasion of opposite gendered pokemon on entry.",
+		id: "allure",
+		isNonstandard: true,
+        // Like Rivalry
+        onSourceAccuracy: function (accuracy, target, source, move) {
+            if (typeof accuracy !== 'number') return;
+            if ((target.gender === 'M' && source.gender === 'F') || (target.gender === 'F' && source.gender === 'M')) {
+                this.debug('Allure - accuracy is 1.2x ');
+                return accuracy * 1.2;
+            }
+        },
+		name: "Allure",
+		rating: 4,
+		num: 201
+	},
+	"brave heart": { //guts
+		desc: "When this Pokemon is poisoned (including Toxic), burned, paralyzed or asleep (including self-induced Rest), its Defense stat receives a 50% boost.",
+		shortDesc: "If this Pokemon is statused, its Defense is 1.5x.",
+		onModifyDefPriority: 5,
+		onModifyDef: function (def, pokemon) {
+			if (pokemon.status) {
+				return this.chainModify(1.5);
+			}
+		},
+		id: "braveheart",
+		name: "Brave Heart",
+		rating: 3,
+		num: 202
+	},
+	"conditioning": { //fury cutter, maybe? i swear to god if half of these work i'll be shocked
+	//honestly i'm not sure how to make this one work so here's the fury cutter code
+		desc: "When this Pokemon is poisoned (including Toxic), burned, paralyzed or asleep (including self-induced Rest), its Attack stat receives a 50% boost; the burn status' Attack drop is also ignored.",
+		shortDesc: "If this Pokemon is statused, its Attack is 1.5x; burn's Attack drop is ignored.",
+		basePowerCallback: function (pokemon) {
+		if (!pokemon.volatiles.furycutter) {
+			pokemon.addVolatile('furycutter');
+		}
+		return 40 * pokemon.volatiles.furycutter.multiplier;
+		},
+		id: "conditioning",
+		name: "Conditioning",
+		rating: 3,
+		num: 203
+	},
+	"content": { //damn there are so many difficult ones to code, rain dish + color change?
+		desc: "If a status move is used., this Pokemon recovers 1/16 of its max HP after each turn.",
+		shortDesc: "If a status move is used, this Pokemon heals 1/16 of its max HP each turn.",
+		onAfterMoveSecondary: function (source, target, move) { //once again switching target and source
+		if (target.isActive && move && move.category !== 'Status') { //did i mention i don't know java
+			this.heal(target.maxhp / 16); //pulled from rain dish
+		    }
+		},
+		id: "content",
+		name: "Content",
+		rating: 3,
+		num: 204
+	},
+	"conundrum": { //easily pulled from poison point
+		desc: "If an opponent contact attacks this Pokemon, there is a 30% chance that the opponent will become confused.",
+		shortDesc: "30% chance of confusing a Pokemon making contact with this Pokemon.",
+		onAfterDamage: function (damage, target, source, move) {
+			if (move && move.isContact) {
+				if (this.random(10) < 3) {
+					source.tryVolatives('confusion', target, move); //I think confusion is a volatile
+				}
+			}
+		},
+		id: "content",
+		name: "Content",
+		rating: 3,
+		num: 205
+	},
+	"discretion": { //pressure might be a good base, also High Jump Kick
+		desc: "If this Pokemon's move misses, the move does not cost any PP.",
+		shortDesc: "If this Pokemon's move misses, it costs no PP.",
+		//onTargetDeductPP: function (pp, source, target) { //i worry for my antics
+		//	if (target.side === source.side) return;
+		//	return pp - 1;
+		//},
+		//onMoveFail: function (target, source, move) {
+		//this.damage(source.maxhp / 2, source, source, 'highjumpkick');
+		//},
+		onMoveFail: function (target, source, move) {
+		},
+		id: "discretion",
+		name: "discretion",
+		rating: 1.5,
+		num: 206
+	},
+	"eccentric": { //special hustle
+		desc: "This Pokemon's Special Attack receives a 50% boost but its Special attacks receive a 20% drop in Accuracy. For example, a 100% accurate move would become an 80% accurate move. The accuracy of moves that never miss, such as Swift, remains unaffected.",
+		shortDesc: "This Pokemon's Special Attack is 1.5x and accuracy of its special attacks is 0.8x.",
+		// This should be applied directly to the stat as opposed to chaining witht he others
+		onModifySpAPriority: 5,
+		onModifySpA: function (spa) {
+			return this.modify(spa, 1.5);
+		},
+		onModifyMove: function (move) {
+			if (move.category === 'Special' && typeof move.accuracy === 'number') {
+				move.accuracy *= 0.8;
+			}
+		},
+		id: "eccentric",
+		name: "Eccentric",
+		rating: 3,
+		num: 207
+	},
+	"feedback": { //pulled from rough skin + flare boost for modifier
+		desc: "Causes recoil damage equal to 1/8 of the opponent's max HP if an opponent uses a special move.",
+		shortDesc: "This Pokemon causes other Pokemon using a special move to lose 1/8 of their max HP.",
+		onAfterDamageOrder: 1,
+		onAfterDamage: function (damage, target, source, move) {
+			if (source && source !== target && move && move.category === 'Special') {
+				this.damage(source.maxhp / 8, source, target, null, true);
+			}
+		},
+		id: "feedback",
+		name: "Feedback",
+		rating: 3,
+		num: 208
+	},
+	"full force": {
+		desc: "When this Pokemon uses an attack that has 60 Base Power or less (including Struggle), the move's Critical Hit chance is doubled.",
+		shortDesc: "This Pokemon's attacks of 60 Base Power or less have twice the critical chance. Includes Struggle.",
+		onModifyMove: function (move) {
+			if (move.basePower <= 60) {
+				move.critRatio++;
+			}
+        },
+		id: "fullforce",
+		name: "Full Force",
+		rating: 4,
+		num: 209
+	},
+	"ice slick": { //hail chlorophyll
+		desc: "If this Pokemon is active while Hail is in effect, its speed is temporarily doubled.",
+		shortDesc: "If Hail is active, this Pokemon's Speed is doubled.",
+		onModifySpe: function (speMod) {
+			if (this.isWeather('hail')) {
+				return this.chain(speMod, 2);
+			}
+		},
+		id: "iceslick",
+		name: "Ice Slick",
+		rating: 2,
+		num: 210
+	},
+	"iron jaw": { //literally strong jaw
+		desc: "This Pokemon receives a 50% power boost for jaw attacks such as Bite and Crunch.",
+		shortDesc: "This Pokemon's bite-based attacks do 1.5x damage.",
+		onBasePowerPriority: 8,
+		onBasePower: function (basePower, attacker, defender, move) {
+			if (move.isBiteAttack) {
+				return this.chainModify(1.5);
+			}
+		},
+		id: "ironjaw",
+		name: "Iron Jaw",
+		rating: 3,
+		num: 211
+	},
+	"malice": { //if you know what secondary effects are please do this one, my guess is it's things like toxic damage
+		desc: "Bearer's attacks of the same type asx the bearer are not affected by the foe's type immunity.",
+		shortDesc: "Moves with same type attack bonus ignore type resistance.",
+		//code here
+		id: "perforate",
+		name: "Perforate",
+		rating: 2,
+		num: 212
+	},
+	"perforate": { //this one will take a while
+		desc: "Bearer's attacks of the same type asx the bearer are not affected by the foe's type immunity.",
+		shortDesc: "Moves with same type attack bonus ignore type resistance.",
+		//code here
+		id: "perforate",
+		name: "Perforate",
+		rating: 2,
+		num: 213
+	},
+	"permafrost": {
+		desc: "If this Pokemon is active while Hail is in effect, its defense is temporarily raised.",
+		shortDesc: "If Hail is active, this Pokemon's Defense is raised.",
+		onModifyDef: function (defMod) {
+			if (this.isWeather('hail')) {
+				return this.chain(defMod, 1.5);
+			}
+		},
+		id: "permafrost",
+		name: "Permafrost",
+		rating: 2,
+		num: 214
+	},
+	"psych out": { //special intimidate
+		desc: "When this Pokemon enters the field, the Special Attack stat of each of its opponents lowers by one stage.",
+		shortDesc: "On switch-in, this Pokemon lowers adjacent foes' Special Attack by 1.",
+		onStart: function (pokemon) {
+			var foeactive = pokemon.side.foe.active;
+			for (var i = 0; i < foeactive.length; i++) {
+				if (!foeactive[i] || !this.isAdjacent(foeactive[i], pokemon)) continue;
+				if (foeactive[i].volatiles['substitute']) {
+					// does it give a message? note this is not my comment
+					this.add('-activate', foeactive[i], 'Substitute', 'ability: Psych Out', '[of] ' + pokemon);
+				} else {
+					this.add('-ability', pokemon, 'Intimidate', '[of] ' + foeactive[i]);
+					this.boost({spa: -1}, foeactive[i], pokemon);
+				} //do we need to add an 'ability: Psych Out' or something
+			}
+		},
+		id: "psychout",
+		name: "Psych Out",
+		rating: 3.5,
+		num: 215
+	},
+	"stubborn": { //ripped from marvel scale and overgrow
+		desc: " When this pokemon reaches half health or less, its Defense receives a 50% boost.",
+		shortDesc: "If this Pokemon is at less than half health, its Defense is 1.5x.",
+		onModifyDefPriority: 6,
+		onModifyDef: function (def, pokemon) {
+			if (attacker.hp <= attacker.maxhp / 2) {
+				return this.chainModify(1.5);
+			}
+		},
+		id: "stubborn",
+		name: "Stubborn",
+		rating: 3,
+		num: 216
+	},
+	"sunbathe": { //sunny rain dish
+		desc: "If the weather is Sunny Day, this Pokemon recovers 1/16 of its max HP after each turn.",
+		shortDesc: "If the weather is Sunny Day, this Pokemon heals 1/16 of its max HP each turn.",
+		onWeather: function (target, source, effect) {
+			if (effect.id === 'sunnyday') {
+				this.heal(target.maxhp / 16);
+			}
+		},
+		id: "sunbathe",
+		name: "Sunbathe",
+		rating: 1.5,
+		num: 217
+	},
+	"team player": { //simple and plus
+		desc: "This Pokemon doubles all of its positive and negative stat modifiers in a double battle. For example, if this Pokemon uses Curse, its Attack and Defense stats increase by two stages and its Speed stat decreases by two stages.",
+		shortDesc: "This Pokemon has its own stat boosts and drops doubled in a double battle as they happen.",
+		onBoost: function (boost) {
+            var allyActive = pokemon.side.active;
+            if (allyActive.length === 1) {
+                return;
+            }
+            for (var i = 0; i < allyActive.length; i++) {
+                if (allyActive[i] && allyActive[i].position !== pokemon.position && !allyActive[i].fainted) {
+                    for (var i in boost) {
+                    boost[i] *= 2;
+                    };
+                }
+            }
+            //what i think i did here:
+            //if the ally's around, and a stat boost happens, it gets doubled
+            //i really hope that works
+		},
+
+		id: "teamplayer",
+		name: "Team Player",
+		rating: 4,
+		num: 218
+	},
+	"expert": { //LITERALLY adaptability, but maybe it's for both sides?
+		desc: "This Pokemon's attacks that receive STAB (Same Type Attack Bonus) are increased from 50% to 100%.",
+		shortDesc: "This Pokemon's same-type attack bonus (STAB) is increased from 1.5x to 2x.",
+		onModifyMove: function (move) {
+			move.stab = 2;
+		},
+		id: "expert",
+		name: "Expert",
+		rating: 3.5,
+		num: 91	
+	},
+	"novice": { //is it for both sides?
+		desc: "This Pokemon's attacks that receive STAB (Same Type Attack Bonus) are increased from 50% to 100%.",
+		shortDesc: "This Pokemon's same-type attack bonus (STAB) is increased from 1.5x to 2x.",
+		onModifyMove: function (move) {
+			move.stab = 1;
+		},
+		id: "novice",
+		name: "Novice",
+		rating: 3.5,
+		num: 219
+	},
+	//SAGE signature
+	/*"eventide": { 
+		//We need to somehow find Espeon and Umbreon's evolution info to get this one.
+	},*/
+	/*"feisty": { //pulled from the battle engine and from blaze
+		onModifyAtkPriority: 5,
+		onModifyAtk: function (atk, attacker, defender, move) {
+			if (target.level > pokemon.level) {
+				//this.debug('Feisty boost'); commented out because I don't know what it does
+				return this.chainModify(1.5);
+			}
+		}
+	},*/
+	/*"forage": {
+		
+	}, //just take pickup code
+	"mooch": { //lord how the fuck is this one going in
+		
+	},*/
+	"orbital tide": { //uses pressure as the base
+		desc: "Gravity is applied when this Pokemon switches in.",
+		shortDesc: "Applies gravity in battle.",
+		onStart: function (pokemon) {
+			Battle.prototype.setPseudoWeather = function(args){
+			this.addPseudoWeather('gravity', source, sourceEffect) //what am i doing
+			}
+		},
+		id: "orbitaltide",
+		name: "Orbital Tide",
+		rating: 1.5,
+		num: 224
+	},
+	/*"overshadow": { //nowhere is height used as a var
+	    onStart: function (pokemon) {
+		    this.height = this.template.height;
+		    this.heightm = this.template.heightm; //some stuff from the battle engine
+		}
+	},*/
+	/*"pollution": { //acid rain needs to be coded in first
+		
+	},*/
+	"quickdraw": {
+		onModifyPriority: function (priority, pokemon, target, move) {
+			return 0;
+		}, //this does it for the user
+		onModifyPriority: function (priority, pokemon, source, move) {
+			return 0;
+		}, //maybe this does it for the target too?
+		id: "quickdraw",
+		name: "Quickdraw",
+		rating: 1.5,
+		num: 227
+	},
+	/*"siphon": { //liquid ooze for info?
+			
+	},
+	"spectrum": { //borrow code from color change / protean and add in a detect color function?
+		
+	},*/
+	//SAGE LEGENDARIES
+	//to be determined
+
+	
+	
+	
+	
 };
