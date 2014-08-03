@@ -282,7 +282,7 @@ var Tools = {
 	resourcePrefix: (function() {
 		var prefix = '';
 		if (document.location.protocol === 'file:') prefix = 'http:';
-		return prefix + '//72.67.7.68/';
+		return prefix + '//play.pokemonshowdown.com/';
 	})(),
 
 	resolveAvatar: function(avatar) {
