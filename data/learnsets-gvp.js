@@ -29,6 +29,7 @@ the first two and the last two should theoretically be mutually exclusive but th
 // Everything after #173 may or may not have all its moves. I didn't tell them to document it, oh well.
 /* Note to anyone reading: Once we are SURE that something is good, it wouldn't be a bad idea to collapse the data to
 make it take up less lines. This is optional. */
+exports.BattleLearnsets = {
 Foliat:{
         learnset:{
                 tackle:["5L1"],
@@ -18518,4 +18519,5 @@ Xotec:{
                 //egg move
                 
         }
-},
+}
+};
