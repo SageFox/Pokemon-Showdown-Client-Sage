@@ -63,7 +63,7 @@ exports.BattleAbilities = {
 			}
 		},
 		rating: 3,
-		num: 106
+		num: 106sag
 	},
 	"aerilate": {
 		desc: "Turns all of this Pokemon's Normal-typed attacks into Flying-type and deal 1.3x damage. Does not affect Hidden Power.",
@@ -3258,7 +3258,7 @@ exports.BattleAbilities = {
 		// implemented in the corresponding move
 		rating: 4,
 		num: -4
-	}
+	},
 	
 	
 	
@@ -3287,14 +3287,14 @@ exports.BattleAbilities = {
 		shortDesc: "Lowers evasion of opposite gendered pokemon on entry.",
 		id: "allure",
 		isNonstandard: true,
-        // Like Rivalry
-        onSourceAccuracy: function (accuracy, target, source, move) {
-            if (typeof accuracy !== 'number') return;
-            if ((target.gender === 'M' && source.gender === 'F') || (target.gender === 'F' && source.gender === 'M')) {
-                this.debug('Allure - accuracy is 1.2x ');
-                return accuracy * 1.2;
-            }
-        },
+        	// Like Rivalry
+	        onSourceAccuracy: function (accuracy, target, source, move) {
+	            if (typeof accuracy !== 'number') return;
+	            if ((target.gender === 'M' && source.gender === 'F') || (target.gender === 'F' && source.gender === 'M')) {
+	                this.debug('Allure - accuracy is 1.2x ');
+	                return accuracy * 1.2;
+	            }
+	        },
 		name: "Allure",
 		rating: 4,
 		num: 201
