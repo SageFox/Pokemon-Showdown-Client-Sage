@@ -4782,7 +4782,7 @@ exports.BattleFormatsData = {
 		viableMoves: {"aurasphere":1,"darkpulse":1,"taunt":1,"painsplit":1,"substitute":1,"hiddenpowerice":1,"vacuumwave":1},
 		isNonstandard: true,
 		tier: "CAP"
-	}
+	},
 	foliat: { isNonstandard: true, tier: "VP" },
 	florabri: { isNonstandard: true, tier: "VP" },
 	florresum: { isNonstandard: true, tier: "VP" },
