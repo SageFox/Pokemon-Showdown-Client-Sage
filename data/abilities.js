@@ -63,7 +63,7 @@ exports.BattleAbilities = {
 			}
 		},
 		rating: 3,
-		num: 106sag
+		num: 106
 	},
 	"aerilate": {
 		desc: "Turns all of this Pokemon's Normal-typed attacks into Flying-type and deal 1.3x damage. Does not affect Hidden Power.",
